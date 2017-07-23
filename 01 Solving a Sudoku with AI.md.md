@@ -94,10 +94,15 @@ def grid_values(grid):
 经过前面两步，我们已经将一个数独问题构造为一个计算机能理解的结构。现在一个首要问题是——如何求解？这里引入一个概念：Constraint Propagation。
 Constraint Propagation是AI中一个非常常用而且也效果显著的思路。Constraint Propagation通过使用所有在搜索空间中的约束条件，进而缩小搜索空间的范围。在数独问题中，boxes中的value就是我们的搜索空间，我们需要逐步减少待填格子的可填值（possible value）。在每一个units中，各个box的值不能重复，这是数独问题的constrain。下面我们通过两个策略来实现数独问题的Constraint Propagation。
 - eliminate:将待填box中的.替换为'123456789'，根据其peers的取值情况，移除其peers包含的value。如图一所示，B5所在units所包含的值有1、2、3、5、6、8、9，所有B5的possible value为4和7。同理，其他box也通过这种方式处理，处理完后的数独如图二所示。
+
 图一
+
 ![](http://i.imgur.com/YFTZzym.jpg)
+
 图二
+
 ![](http://i.imgur.com/ne5anv4.jpg)
+
 python实现eliminate代码如下：
 
 ```
@@ -124,6 +129,7 @@ def eliminate(values):
 ```
 - only choice:在图二中A4到B6所构成的3*3units中，我们发现A6中1在其他所有待填box中都没有出现，因此我们可以断定A6的值为1。这种从待填box已有取值情况，判断出唯一解的思路，就是only choice。
 ![](http://i.imgur.com/yHWEDzt.jpg)
+
 python代码实现only choice：
 
 ```
@@ -180,10 +186,15 @@ def reduce_puzzle(values):
 
 #### 3.2 search
 对于复杂的数独问题，在Constraint Propagation之后，仍然还有box未得到答案。这里我们就需要用到搜索（search）的技巧。如图三，我们看到仍有相当多的格子仍待解决，如何选取box？答案是选possible value最少的那个，即G2。我们将8和9分别填入G2中，然后对两个新的数独使用Constraint Propagation，若还存在未解决box，继续使用search，知道所有box都填入答案。这是一个深度优先搜索，过程如图四所示。
+
 图三
+
 ![](http://i.imgur.com/xgGTTJE.jpg)
+
 图四
+
 ![](http://i.imgur.com/JpvYCTS.jpg)
+
 python实现search代码如下：
 
 ```
